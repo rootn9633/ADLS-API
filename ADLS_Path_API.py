@@ -1,8 +1,10 @@
+import os
 import threading
+import math
 import ADLSconfig as config
 from ADLSconnection import ADLS_connection
 
-def ADLS_file_upload(content_file, file_path, storage_account_name, storage_account_key, batch_size=1E6, api_version='2018-11-09'):
+def ADLS_file_upload(content_file, file_path, storage_account_name, storage_account_key, upload_streams=config.upload_streams, api_version='2018-11-09'):
     connection = ADLS_connection(file_path, storage_account_name, storage_account_key, api_version)
     # check file
     status = connection.send_request('HEAD')['code']
@@ -16,6 +18,7 @@ def ADLS_file_upload(content_file, file_path, storage_account_name, storage_acco
     with open(content_file, mode='r') as f:
         # connection.send_request('PATCH', request_params={'action': 'append', 'position': str(position)}, content=batch)
         threads = list()
+        batch_size = math.ceil(os.path.getsize(content_file)/upload_streams)
         for batch in iter(lambda: f.read(int(batch_size)), ""):
             x = threading.Thread(target=connection.send_request, args=('PATCH', ), kwargs={'request_params':{'action': 'append', 'position': str(position)}, 'content':batch})
             threads.append(x)

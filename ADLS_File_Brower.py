@@ -47,7 +47,7 @@ if __name__ == "__main__":
         else:
             directory = choose_file(current_path[0], ''.join(current_path[1:]))
             if directory == '.':
-                ADLS_file_upload(filename, ''.join(current_path)+filename, config.storage_account_name, config.storage_account_key, batch_size=config.batch_size)
+                ADLS_file_upload(filename, ''.join(current_path)+filename, config.storage_account_name, config.storage_account_key)
                 exit()
             elif directory == '..':
                 del current_path[-1]
